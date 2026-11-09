@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FPV Flight Simulator: Real-Time FPV Drone Flight for Blender</title>
+<meta name="description" content="FPV Flight Simulator for Blender: fly a real-feel FPV drone live in the viewport with your RC radio, gamepad or keyboard, using Betaflight rates and real quad physics, and record every flight as keyframes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira:wdth,wght@75..100,500..800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --dusk: #15222d;
+  --deck: #1c2c39;
+  --deck-2: #233646;
+  --rule: #2f4455;
+  --ink: #eef3f5;
+  --mute: #a3b4c0;
+  --soft: #7f93a2;
+  --ring: #f4e2cb;
+  --ok: #4fe3b0;
+  --s0: #4080ff;
+  --s1: #26d9f2;
+  --s2: #59f273;
+  --s3: #ffcc33;
+  --s4: #ff4d33;
+  --ramp: linear-gradient(90deg, var(--s0) 0%, var(--s1) 30%, var(--s2) 55%, var(--s3) 78%, var(--s4) 100%);
+  --display: "Saira", "Arial Narrow", sans-serif;
+  --body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --gutter: 64px;
+  --line-x: 22px;
+  --r: 14px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--dusk); }
+body { color: var(--ink); font: 400 16px/1.6 var(--body); -webkit-font-smoothing: antialiased; }
+img, video { display: block; max-width: 100%; }
+a { color: var(--ring); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, video:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; border-radius: 6px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(50px, 10vw, 88px); font-weight: 800; font-stretch: 86%; line-height: 0.9; letter-spacing: -0.01em; }
+h2 { font-size: clamp(30px, 5.2vw, 44px); font-weight: 760; font-stretch: 90%; line-height: 1.02; }
+h1 .sub { display: block; margin-top: 14px; font-size: clamp(20px, 3.4vw, 28px); font-weight: 650; font-stretch: 92%; line-height: 1.1; letter-spacing: 0; color: var(--ring); }
+h3 { font-size: 18px; font-weight: 700; font-stretch: 95%; line-height: 1.2; }
+p { margin: 0; }
+.copy { color: var(--mute); max-width: 62ch; }
+.copy b, .lede b { color: var(--ink); font-weight: 600; }
+
+.page { position: relative; max-width: 832px; margin: 0 auto; padding: 40px 24px 56px var(--gutter); }
+.route { position: absolute; top: 210px; bottom: 150px; left: var(--line-x); width: 3px; border-radius: 3px; opacity: 0.85;
+  background: linear-gradient(180deg, var(--s0) 0%, var(--s1) 14%, var(--s2) 28%, var(--s3) 40%, var(--s4) 50%, var(--s3) 60%, var(--s2) 72%, var(--s1) 86%, var(--s0) 100%); }
+.route::after { content: ""; position: absolute; inset: 0 -2px; background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 2.5px, transparent 3px) center top / 7px 96px repeat-y; }
+section { position: relative; display: grid; gap: 22px; padding-top: 92px; }
+.gate { position: absolute; top: 88px; left: calc(var(--line-x) - var(--gutter) - 15px); width: 33px; height: 33px; border-radius: 50%; border: 3px solid var(--ring); background: var(--dusk); display: grid; place-items: center; font: 700 12px/1 var(--display); color: var(--ring); transition: background-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease; }
+.gate.lit { background: var(--ring); color: var(--dusk); box-shadow: 0 0 0 6px rgba(244, 226, 203, 0.14), 0 0 22px rgba(244, 226, 203, 0.35); }
+.head { display: grid; gap: 12px; }
+.kicker { font-family: var(--display); font-size: 15px; font-weight: 600; font-stretch: 95%; color: var(--ring); }
+
+.hero { display: grid; gap: 22px; position: relative; }
+.maker { font-size: 14px; color: var(--soft); }
+.lede { font-size: 19px; line-height: 1.55; color: var(--mute); max-width: 56ch; }
+.frame { position: relative; border-radius: var(--r); overflow: hidden; background: #0f1922; aspect-ratio: 16 / 9; }
+.frame video, .frame img { width: 100%; height: 100%; object-fit: cover; }
+.frame video { cursor: pointer; }
+.readout { position: absolute; left: 12px; bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px; pointer-events: none; }
+.readout span { font: 600 13px/1 var(--display); font-stretch: 95%; font-variant-numeric: tabular-nums; color: var(--ink); background: rgba(21, 34, 45, 0.72); border: 1px solid rgba(238, 243, 245, 0.18); border-radius: 7px; padding: 7px 9px; backdrop-filter: blur(6px); }
+.readout .style { color: var(--dusk); background: var(--ring); border-color: var(--ring); }
+.rec { position: absolute; right: 12px; top: 12px; display: flex; align-items: center; gap: 7px; font: 700 13px/1 var(--display); letter-spacing: .04em; background: rgba(21, 34, 45, 0.72); border: 1px solid rgba(238, 243, 245, 0.18); border-radius: 7px; padding: 7px 10px; pointer-events: none; }
+.rec::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #ff4d4d; box-shadow: 0 0 10px #ff4d4d; }
+.summary { display: flex; flex-wrap: wrap; gap: 8px; }
+.summary span { font-size: 14px; color: var(--ink); background: var(--deck); border: 1px solid var(--rule); border-radius: 999px; padding: 6px 13px; }
+.summary b { font-family: var(--display); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ring); margin-right: 4px; }
+
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px; align-items: start; }
+.split.wide-left { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); }
+.shot { border-radius: var(--r); overflow: hidden; border: 1px solid var(--rule); background: #303030; }
+.shot img { width: 100%; height: auto; }
+.cap { font-size: 13px; color: var(--soft); margin-top: 8px; }
+
+.keys { display: grid; border: 1px solid var(--rule); border-radius: var(--r); overflow: hidden; }
+.keys div { display: grid; grid-template-columns: 128px minmax(0, 1fr); gap: 12px; align-items: center; padding: 11px 14px; background: var(--deck); font-size: 14.5px; color: var(--mute); }
+.keys div + div { border-top: 1px solid var(--rule); }
+.keys .grp { font-weight: 600; color: var(--ink); }
+kbd { font: 600 13px/1 var(--body); color: var(--ink); background: var(--deck-2); border: 1px solid var(--rule); border-bottom-width: 2px; border-radius: 6px; padding: 5px 8px; white-space: nowrap; justify-self: start; }
+
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; counter-reset: s; }
+.steps li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; color: var(--mute); counter-increment: s; }
+.steps li::before { content: counter(s); width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--rule); display: grid; place-items: center; font: 700 12px/1 var(--display); color: var(--ink); margin-top: 1px; }
+.steps b { color: var(--ink); font-weight: 600; }
+
+.compat { display: grid; gap: 14px; border: 1px solid var(--rule); border-radius: var(--r); background: var(--deck); padding: 18px 20px; }
+.compat h3 { color: var(--ring); font-size: 15px; letter-spacing: .06em; text-transform: uppercase; }
+.compat ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 26px; }
+.compat li { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--rule); font-size: 15px; }
+.compat li svg { width: 20px; height: 20px; }
+.compat li span:last-child { font: 600 13px/1 var(--display); color: var(--ok); }
+.compat .os { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 14px; color: var(--mute); }
+.compat .os b { font-family: var(--display); color: var(--ink); font-weight: 700; }
+
+.moves { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.group { background: var(--deck); border: 1px solid var(--rule); border-radius: var(--r); padding: 16px 18px 6px; }
+.group h3 { color: var(--ring); font-size: 16px; margin-bottom: 6px; }
+.group dl { margin: 0; }
+.group div { display: grid; grid-template-columns: 108px minmax(0, 1fr); gap: 10px; padding: 9px 0; border-top: 1px solid var(--rule); font-size: 14px; }
+.group div:first-child { border-top: 0; }
+.group dt { font-weight: 600; color: var(--ink); }
+.group dd { margin: 0; color: var(--mute); }
+.note { font-size: 14px; color: var(--soft); max-width: 70ch; }
+
+.drones { display: grid; gap: 8px; }
+.drone { display: grid; grid-template-columns: minmax(0, 1.5fr) repeat(4, minmax(0, 1fr)); gap: 14px; align-items: center; padding: 12px 16px; background: var(--deck); border: 1px solid var(--rule); border-radius: 12px; }
+.drone.labels { background: none; border-color: transparent; padding-block: 0 2px; font-size: 13px; color: var(--soft); }
+.drone h3 { font-size: 16px; }
+.drone p { font-size: 12.5px; color: var(--soft); line-height: 1.35; margin-top: 2px; }
+.drone .tag { display: inline-block; font: 600 11px/1 var(--display); letter-spacing: .05em; text-transform: uppercase; color: var(--dusk); background: var(--ring); border-radius: 5px; padding: 3px 6px; margin-left: 6px; vertical-align: 2px; }
+.val { font: 700 16px/1 var(--display); font-variant-numeric: tabular-nums; }
+.val small { font: 500 12px/1 var(--body); color: var(--soft); margin-left: 3px; }
+
+.tabs { display: flex; gap: 4px; padding: 4px; background: var(--deck); border: 1px solid var(--rule); border-radius: 12px; overflow-x: auto; scrollbar-width: none; }
+.tabs button { flex: 1 0 auto; border: 0; background: transparent; color: var(--mute); font: 600 14px/1 var(--body); padding: 12px 16px; border-radius: 9px; cursor: pointer; white-space: nowrap; min-height: 44px; transition: background-color 0.2s ease, color 0.2s ease; }
+.tabs button:hover { color: var(--ink); }
+.tabs button[aria-selected="true"] { background: var(--ring); color: var(--dusk); }
+.camtext { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline; }
+.camtext p { color: var(--mute); font-size: 15px; }
+.camtext span { font-size: 13px; color: var(--soft); white-space: nowrap; }
+
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 28px; }
+.facts div { display: grid; gap: 6px; align-content: start; }
+.facts p { font-size: 14.5px; color: var(--mute); }
+.measure { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--rule); border-radius: var(--r); overflow: hidden; }
+.measure div { padding: 14px 16px; background: var(--deck); display: grid; gap: 4px; }
+.measure div + div { border-left: 1px solid var(--rule); }
+.measure b { font: 750 24px/1.05 var(--display); font-stretch: 92%; font-variant-numeric: tabular-nums; }
+.measure span { font-size: 13px; color: var(--mute); line-height: 1.4; }
+
+.specs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; margin: 0; border-top: 1px solid var(--rule); }
+.specs div { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--rule); font-size: 14.5px; }
+.specs dt { color: var(--soft); }
+.specs dd { margin: 0; }
+.pair { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 18px 20px; border-radius: var(--r); background: var(--deck); border: 1px solid var(--rule); }
+.pair p { color: var(--mute); font-size: 15px; }
+.pair a { font-weight: 600; white-space: nowrap; }
+footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--rule); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 20px; font-size: 13px; color: var(--soft); }
+
+@media (max-width: 720px) {
+  .drone { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .drone > div:first-child { grid-column: 1 / -1; }
+  .drone.labels > span:first-child { display: none; }
+}
+@media (max-width: 600px) {
+  :root { --gutter: 46px; --line-x: 16px; }
+  .split, .split.wide-left, .moves, .facts, .specs, .compat ul { grid-template-columns: 1fr; }
+  .measure { grid-template-columns: 1fr; }
+  .measure div + div { border-left: 0; border-top: 1px solid var(--rule); }
+  .gate { width: 29px; height: 29px; left: calc(var(--line-x) - var(--gutter) - 13px); font-size: 11px; }
+  .camtext { grid-template-columns: 1fr; }
+  .pair { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .readout { left: 8px; bottom: 8px; gap: 4px; }
+  .readout span { font-size: 11px; padding: 5px 6px; }
+}
+@media (max-width: 380px) {
+  .page { padding-right: 16px; }
+  .keys div, .group div, .specs div { grid-template-columns: 1fr; gap: 4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gate, .tabs button { transition: none; }
+}
+.framed, .framed body { overflow: hidden; scrollbar-width: none; }
+.framed::-webkit-scrollbar, .framed body::-webkit-scrollbar { display: none; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ok" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9.5" fill="#4fe3b0" opacity=".16"/><path d="M5.6 10.4l3 3 6-6.8" fill="none" stroke="#4fe3b0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol></svg>
+<main class="page">
+  <div class="route" aria-hidden="true"></div>
+
+  <header class="hero">
+    <p class="maker">Blender add-on by LarkLab</p>
+    <h1>FPV Flight Simulator<span class="sub">Real-time FPV drone flight for Blender</span></h1>
+    <p class="lede">Plug in your <b>RC radio or gamepad</b> and fly a real-feel FPV drone <b>live in the viewport</b>, through your own scene. Betaflight rates, real quad physics and collisions. Every flight is recorded as keyframes, ready to render.</p>
+    <div class="frame">
+      <video class="lazy" data-src="media/hero.mp4" poster="media/hero.webp" muted loop playsinline preload="none" tabindex="0" aria-label="FPV camera flight through glowing light-show drone gates over a city at night, rendered in Blender. Click to pause."></video>
+      <div class="readout" aria-label="This flight"><span class="style">Acro</span><span>5" Freestyle</span><span>Betaflight Actual rates</span><span>Rendered in Eevee</span></div>
+    </div>
+    <div class="summary" aria-label="What is in the add-on">
+      <span><b>13</b>drone presets</span><span><b>4</b>flight modes</span><span><b>4</b>Betaflight rate types</span><span><b>3</b>cameras</span><span><b>0</b>dependencies</span>
+    </div>
+  </header>
+
+  <section aria-labelledby="s1">
+    <span class="gate" aria-hidden="true">01</span>
+    <div class="head">
+      <span class="kicker">Plug in and fly</span>
+      <h2 id="s1">Your radio. Your gamepad. Or the keyboard.</h2>
+      <p class="copy">Controllers are read straight through Windows, so there is <b>nothing else to install</b>. A short setup wizard finds every stick, its direction and range, and the add-on remembers each controller for next time.</p>
+    </div>
+    <div class="split wide-left">
+      <div style="display:grid;gap:20px">
+        <ol class="steps">
+          <li><span>Install the zip: <b>Edit &gt; Preferences &gt; Get Extensions &gt; Install from Disk</b>.</span></li>
+          <li><span>Open the <b>FPV Flight Simulator</b> tab (N), pick your controller and press <b>Set Up Controller</b>.</span></li>
+          <li><span>Hold each stick when asked: throttle, yaw, pitch, roll. Done in about thirty seconds.</span></li>
+          <li><span>Press <b>Fly</b> (Ctrl+Shift+F), arm with the throttle low and take off.</span></li>
+        </ol>
+      </div>
+      <figure style="margin:0;justify-self:center">
+        <div class="shot" style="max-width:260px"><img src="media/ui_wizard.webp" width="372" height="770" loading="lazy" decoding="async" alt="The controller panel during setup: step 2 of 7, push throttle fully up, with live bars for every channel of a Radiomaster Boxer"></div>
+        <figcaption class="cap" style="max-width:260px">The wizard shows every channel live while you move the sticks.</figcaption>
+      </figure>
+    </div>
+    <div class="compat" aria-labelledby="compat-h">
+      <div class="os"><svg width="20" height="20" aria-hidden="true"><use href="#ok"/></svg><b id="compat-h">Windows</b><span>USB joystick (HID) and XInput controllers</span></div>
+      <h3>Radios</h3>
+      <ul>
+        <li><svg aria-hidden="true"><use href="#ok"/></svg><span>Radiomaster (Boxer, TX16S, Zorro, Pocket)</span><span>Yes</span></li>
+        <li><svg aria-hidden="true"><use href="#ok"/></svg><span>TBS Tango 2 &amp; Mambo</span><span>Yes</span></li>
+        <li><svg aria-hidden="true"><use href="#ok"/></svg><span>Jumper (T-Pro, T20, T-Lite)</span><span>Yes</span></li>
+        <li><svg aria-hidden="true"><use href="#ok"/></svg><span>BetaFPV LiteRadio</span><span>Yes</span></li>
+        <li><svg aria-hidden="true"><use href="#ok"/></svg><span>FlySky</span><span>Yes</span></li>
+        <li><svg aria-hidden="true"><use href="#ok"/></svg><span>iFlight Commando</span><span>Yes</span></li>
+        <li><svg aria-hidden="true"><use href="#ok"/></svg><span>DJI FPV Remote Controller</span><span>Yes</span></li>
+        <li><svg aria-hidden="true"><use href="#ok"/></svg><span>Any EdgeTX / OpenTX radio in USB joystick mode</span><span>Yes</span></li>
+      </ul>
+      <h3>Gamepads and keyboard</h3>
+      <ul>
+        <li><svg aria-hidden="true"><use href="#ok"/></svg><span>Xbox Series X|S</span><span>Yes</span></li>
+        <li><svg aria-hidden="true"><use href="#ok"/></svg><span>Xbox One &amp; Xbox 360</span><span>Yes</span></li>
+        <li><svg aria-hidden="true"><use href="#ok"/></svg><span>PS5 DualSense</span><span>Yes</span></li>
+        <li><svg aria-hidden="true"><use href="#ok"/></svg><span>PS4 DualShock</span><span>Yes</span></li>
+        <li><svg aria-hidden="true"><use href="#ok"/></svg><span>Nintendo Switch Pro</span><span>Yes</span></li>
+        <li><svg aria-hidden="true"><use href="#ok"/></svg><span>Any USB gamepad</span><span>Yes</span></li>
+        <li><svg aria-hidden="true"><use href="#ok"/></svg><span>Keyboard</span><span>Yes</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section aria-labelledby="s2">
+    <span class="gate" aria-hidden="true">02</span>
+    <div class="head">
+      <span class="kicker">Flight model</span>
+      <h2 id="s2">Your Betaflight rates. Real quad physics.</h2>
+      <p class="copy">Rates use the exact Betaflight formulas, so the sticks feel like your quad or your sim. Copy a <b>diff</b> from the Betaflight CLI and press <b>Paste Betaflight Rates</b>: rates, expo, throttle mid and throttle expo come straight in.</p>
+    </div>
+    <div class="split wide-left">
+      <div class="facts" style="grid-template-columns:1fr">
+        <div><h3>Thrust that behaves</h3><p>Motors spool up and down, thrust grows with motor speed and fades as the props lose bite at speed, so punch-outs and dives feel right.</p></div>
+        <div><h3>Air that pushes back</h3><p>Separate front, side and top drag, rotor drag, prop wash when you drop into your own air, wind, turbulence and battery sag.</p></div>
+        <div><h3>Actual, Betaflight, KISS, Quick</h3><p>All four rate types with a live rate curve, plus throttle mid, throttle expo and throttle limit.</p></div>
+      </div>
+      <figure style="margin:0;justify-self:center">
+        <div class="shot" style="max-width:260px"><img src="media/ui_drone.webp" width="298" height="960" loading="lazy" decoding="async" alt="The Drone tab: the 5 inch Freestyle preset card with its build, weight, thrust, hover throttle, top speed and battery, the live rate curve and the rate table"></div>
+      </figure>
+    </div>
+    <div class="measure" aria-label="Measured in the add-on's own physics, 5 inch Freestyle preset">
+      <div><b>670°/s</b><span>full roll stick on Betaflight's default Actual rates, as on the quad</span></div>
+      <div><b>~132 km/h</b><span>level top speed of the 5" Freestyle preset</span></div>
+      <div><b>28%</b><span>hover throttle, like a real 6S freestyle build</span></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="s3">
+    <span class="gate" aria-hidden="true">03</span>
+    <div class="head">
+      <span class="kicker">Drone presets</span>
+      <h2 id="s3">Thirteen drones, from tiny whoop to cinelifter.</h2>
+      <p class="copy">Each preset sets the physics, camera uptilt, battery time and matching rates, with its real build on the card. Change any value and it becomes your own quad.</p>
+    </div>
+    <div class="drones" role="table" aria-label="Drone presets">
+      <div class="drone labels" role="row"><span role="columnheader">Preset</span><span role="columnheader">Weight</span><span role="columnheader">Thrust</span><span role="columnheader">Top speed</span><span role="columnheader">Battery</span></div>
+      <div class="drone" role="row"><div role="rowheader"><h3>5" Freestyle</h3><p>2207 1850KV · 6S 1300 · 5.1" tri</p></div><span class="val" role="cell">680<small>g</small></span><span class="val" role="cell">8.0<small>:1</small></span><span class="val" role="cell">132<small>km/h</small></span><span class="val" role="cell">4<small>min</small></span></div>
+      <div class="drone" role="row"><div role="rowheader"><h3>5" Juicy Freestyle</h3><p>Soft rates, heavy expo, smooth throttle</p></div><span class="val" role="cell">700<small>g</small></span><span class="val" role="cell">7.2<small>:1</small></span><span class="val" role="cell">128<small>km/h</small></span><span class="val" role="cell">4.5<small>min</small></span></div>
+      <div class="drone" role="row"><div role="rowheader"><h3>5" Bando Basher</h3><p>Full GoPro, more prop wash in dives</p></div><span class="val" role="cell">760<small>g</small></span><span class="val" role="cell">7.0<small>:1</small></span><span class="val" role="cell">127<small>km/h</small></span><span class="val" role="cell">4<small>min</small></span></div>
+      <div class="drone" role="row"><div role="rowheader"><h3>5" Race</h3><p>2306 2450KV · near-linear rates</p></div><span class="val" role="cell">550<small>g</small></span><span class="val" role="cell">11<small>:1</small></span><span class="val" role="cell">150<small>km/h</small></span><span class="val" role="cell">2.5<small>min</small></span></div>
+      <div class="drone" role="row"><div role="rowheader"><h3>3" Toothpick</h3><p>Ultralight 4S, floaty and forgiving</p></div><span class="val" role="cell">120<small>g</small></span><span class="val" role="cell">7.0<small>:1</small></span><span class="val" role="cell">85<small>km/h</small></span><span class="val" role="cell">4<small>min</small></span></div>
+      <div class="drone" role="row"><div role="rowheader"><h3>65 mm Tiny Whoop</h3><p>Ducted 1S, flies through doors</p></div><span class="val" role="cell">25<small>g</small></span><span class="val" role="cell">3.2<small>:1</small></span><span class="val" role="cell">45<small>km/h</small></span><span class="val" role="cell">3.5<small>min</small></span></div>
+      <div class="drone" role="row"><div role="rowheader"><h3>3.5" Cinewhoop</h3><p>Ducted, action camera, one-take shots</p></div><span class="val" role="cell">400<small>g</small></span><span class="val" role="cell">4.5<small>:1</small></span><span class="val" role="cell">75<small>km/h</small></span><span class="val" role="cell">5<small>min</small></span></div>
+      <div class="drone" role="row"><div role="rowheader"><h3>2.5" Indoor Cinewhoop</h3><p>Small and steady for flythroughs</p></div><span class="val" role="cell">220<small>g</small></span><span class="val" role="cell">4.0<small>:1</small></span><span class="val" role="cell">64<small>km/h</small></span><span class="val" role="cell">4.5<small>min</small></span></div>
+      <div class="drone" role="row"><div role="rowheader"><h3>4" Light Long Range</h3><p>Li-ion cruiser, long flight time</p></div><span class="val" role="cell">380<small>g</small></span><span class="val" role="cell">5.0<small>:1</small></span><span class="val" role="cell">106<small>km/h</small></span><span class="val" role="cell">15<small>min</small></span></div>
+      <div class="drone" role="row"><div role="rowheader"><h3>6" Mountain Surfer</h3><p>Fast and stable on long dives</p></div><span class="val" role="cell">820<small>g</small></span><span class="val" role="cell">6.5<small>:1</small></span><span class="val" role="cell">132<small>km/h</small></span><span class="val" role="cell">7<small>min</small></span></div>
+      <div class="drone" role="row"><div role="rowheader"><h3>7" Long Range</h3><p>2806.5 1300KV · smooth carving</p></div><span class="val" role="cell">1000<small>g</small></span><span class="val" role="cell">5.0<small>:1</small></span><span class="val" role="cell">122<small>km/h</small></span><span class="val" role="cell">12<small>min</small></span></div>
+      <div class="drone" role="row"><div role="rowheader"><h3>X8 Cinelifter</h3><p>Cinema camera, heavy and stable</p></div><span class="val" role="cell">3000<small>g</small></span><span class="val" role="cell">2.8<small>:1</small></span><span class="val" role="cell">88<small>km/h</small></span><span class="val" role="cell">6<small>min</small></span></div>
+      <div class="drone" role="row"><div role="rowheader"><h3>Beginner Trainer<span class="tag">Angle</span></h3><p>Soft rates, 70% throttle limit</p></div><span class="val" role="cell">620<small>g</small></span><span class="val" role="cell">5.5<small>:1</small></span><span class="val" role="cell">109<small>km/h</small></span><span class="val" role="cell">5<small>min</small></span></div>
+    </div>
+    <p class="note">Top speeds are measured in the add-on's physics at full throttle in level flight.</p>
+  </section>
+
+  <section aria-labelledby="s4">
+    <span class="gate" aria-hidden="true">04</span>
+    <div class="head">
+      <span class="kicker">Flying</span>
+      <h2 id="s4">Live in the viewport, with a pilot's HUD.</h2>
+      <p class="copy">The view switches to the drone's FPV camera. Speed, altitude, throttle, battery, flight mode and both sticks are on screen, and the motors sound as you fly.</p>
+    </div>
+    <div class="frame">
+      <video class="lazy" data-src="media/live.mp4" poster="media/live.webp" muted loop playsinline preload="none" tabindex="0" aria-label="Screen recording of a live flight in the Blender viewport with the flight HUD, flown with a Radiomaster radio. Click to pause."></video>
+      <div class="readout"><span class="style">Live viewport</span><span>Radiomaster Boxer</span></div>
+    </div>
+    <div class="moves">
+      <div class="group"><h3>Flight modes</h3><dl>
+        <div><dt>Acro</dt><dd>Rate mode like a real freestyle quad</dd></div>
+        <div><dt>Angle</dt><dd>Self-leveling, sticks set the tilt</dd></div>
+        <div><dt>Horizon</dt><dd>Levels near center, flips at full stick</dd></div>
+        <div><dt>Cine</dt><dd>Sticks set speed, let go to brake and hover</dd></div>
+      </dl></div>
+      <div class="group"><h3>While you fly</h3><dl>
+        <div><dt>Rewind</dt><dd>Hold Q: time runs back, then fly on from there</dd></div>
+        <div><dt>Slow motion</dt><dd>Fly at half speed, the take plays back at real speed</dd></div>
+        <div><dt>Views</dt><dd>FPV, chase or free camera, one key</dd></div>
+        <div><dt>Arm</dt><dd>Low throttle to arm, like on a real quad</dd></div>
+      </dl></div>
+    </div>
+    <div class="keys" aria-label="Default keys while flying">
+      <div><b class="grp">Sticks</b><span><kbd>W</kbd> <kbd>S</kbd> throttle · <kbd>A</kbd> <kbd>D</kbd> yaw · arrow keys pitch and roll</span></div>
+      <div><b class="grp">Record</b><span><kbd>R</kbd> record and stop, with a 3-2-1 countdown</span></div>
+      <div><b class="grp">Tools</b><span><kbd>Q</kbd> rewind · <kbd>T</kbd> slow-mo · <kbd>M</kbd> mode · <kbd>C</kbd> view · <kbd>V</kbd> arm · <kbd>Backspace</kbd> reset</span></div>
+      <div><b class="grp">Any button</b><span>Bind any action to a key, a gamepad button or a radio switch by pressing it</span></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="s5">
+    <span class="gate" aria-hidden="true">05</span>
+    <div class="head">
+      <span class="kicker">Record and render</span>
+      <h2 id="s5">Every flight becomes keyframes.</h2>
+      <p class="copy">Press Record and fly. Each flight is saved as its own take, plays back on the timeline and renders like any animation, in <b>Eevee or Cycles</b>, on any machine.</p>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Camera views" id="cam-tabs">
+      <button role="tab" aria-selected="true" aria-controls="cam-panel" data-cam="cam_fpv" data-text="The drone's FPV camera with real uptilt and field of view." data-label="FPV camera">FPV</button>
+      <button role="tab" aria-selected="false" aria-controls="cam-panel" data-cam="cam_chase" data-text="A chase camera that follows the drone on a smoothed line, baked for every take." data-label="Chase camera">Chase</button>
+      <button role="tab" aria-selected="false" aria-controls="cam-panel" data-cam="cam_cine" data-text="Your own cameras over the same flight. Stabilized Camera adds a smooth, horizon-level version of the FPV view." data-label="Cinematic">Cinematic</button>
+    </div>
+    <div id="cam-panel" role="tabpanel" style="display:grid;gap:14px">
+      <div class="frame">
+        <video id="cam-video" class="lazy" data-src="media/cam_fpv.mp4" poster="media/cam_fpv.webp" muted loop playsinline preload="none" tabindex="0" aria-label="Camera preview. Click to pause."></video>
+        <div class="readout"><span class="style" id="cam-style">FPV camera</span></div>
+      </div>
+      <div class="camtext"><p id="cam-text">The drone's FPV camera with real uptilt and field of view.</p><span>Rendered in Eevee</span></div>
+    </div>
+    <div class="facts">
+      <div><h3>Retake from any frame</h3><p>Put the playhead where it went wrong. The old take plays for a short pre-roll, then you take over at full speed. Everything before stays.</p></div>
+      <div><h3>Smooth and stabilize</h3><p>Smooth Take softens position and rotation separately. Stabilized Camera gives a smooth, level-horizon camera for cinematic cuts.</p></div>
+      <div><h3>Telemetry for your OSD</h3><p>Speed, altitude, throttle, motor and battery are keyed on the drone, ready for drivers or an OSD.</p></div>
+      <div><h3>Fly your own camera</h3><p>Use the built-in 5" drone and FPV camera, or fly any camera in your scene.</p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="s6">
+    <span class="gate" aria-hidden="true">06</span>
+    <div class="head">
+      <span class="kicker">Your scene</span>
+      <h2 id="s6">It hits what it should hit.</h2>
+    </div>
+    <div class="split">
+      <div style="display:grid;gap:16px">
+        <p class="copy">The drone collides with <b>every visible mesh</b>, including collection instances and Geometry Nodes geometry, or just one collection you choose. Crash and bounce off, reset to the launch pad, or pause.</p>
+        <p class="copy">While you record, the timeline runs with you, so animated objects are where you see them. Wind, turbulence, battery time and scene scale are all one click away.</p>
+      </div>
+      <figure style="margin:0">
+        <div class="frame"><img src="media/overview.webp" width="1600" height="900" loading="lazy" decoding="async" alt="Aerial view of a night city with a 1.8 km race circuit made of thousands of glowing light-show drones, gates and a light tower"></div>
+        <figcaption class="cap">Aerial Track Night: 5,721 light-show drones and 43 gates, every one of them solid.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="s7">
+    <span class="gate" aria-hidden="true">07</span>
+    <div class="head">
+      <h2 id="s7">Details</h2>
+    </div>
+    <dl class="specs">
+      <div><dt>Blender</dt><dd>5.0 or newer</dd></div>
+      <div><dt>System</dt><dd>Windows</dd></div>
+      <div><dt>Type</dt><dd>Blender extension (add-on)</dd></div>
+      <div><dt>Where</dt><dd>FPV Flight Simulator tab in the 3D Viewport sidebar (N)</dd></div>
+      <div><dt>Controllers</dt><dd>RC radios, gamepads, keyboard</dd></div>
+      <div><dt>Output</dt><dd>Keyframes on the drone and cameras</dd></div>
+      <div><dt>Render</dt><dd>Eevee and Cycles</dd></div>
+      <div><dt>Dependencies</dt><dd>None</dd></div>
+      <div><dt>Version</dt><dd>1.0.0</dd></div>
+      <div><dt>License</dt><dd>GPL-3.0-or-later</dd></div>
+    </dl>
+    <div class="pair">
+      <p><b>Want the goggle look?</b> FPV Feed adds signal breakup and a live flight OSD to any render. <b>Rather click than fly?</b> FPV Flight Line builds the whole flight from a few waypoints.</p>
+      <span style="display:grid;gap:6px"><a href="https://superhivemarket.com/products/fpv-feed-drone-camera-fx--live-osd" target="_top" rel="noopener">See FPV Feed</a><a href="https://superhivemarket.com/products/fpv-flight-line-drone-flight-animation-generator" target="_top" rel="noopener">See FPV Flight Line</a></span>
+    </div>
+  </section>
+
+  <footer>
+    <span>FPV Flight Simulator by LarkLab</span>
+    <span>Renders on this page were made in Blender from flights recorded with FPV Flight Simulator.</span>
+  </footer>
+</main>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var framed = true;
+  try { framed = window.self !== window.top; } catch (e) {}
+  if (framed) {
+    root.classList.add("framed");
+    var fit = function () {
+      var w = window.innerWidth;
+      if (w >= 832) { root.style.zoom = ""; return; }
+      root.style.zoom = String(w / (w > 560 ? 832 : 560));
+    };
+    fit();
+    window.addEventListener("resize", fit);
+  }
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var held = new WeakSet();
+
+  function load(v) { if (v.dataset.src && v.getAttribute("src") !== v.dataset.src) v.src = v.dataset.src; }
+  function play(v) {
+    load(v);
+    if (reduce) { v.controls = true; return; }
+    if (held.has(v)) return;
+    var p = v.play();
+    if (p && p.catch) p.catch(function () {});
+  }
+  function toggle(v) {
+    if (v.paused) { held.delete(v); play(v); } else { held.add(v); v.pause(); }
+  }
+  var videos = Array.prototype.slice.call(document.querySelectorAll("video.lazy"));
+  videos.forEach(function (v) {
+    v.addEventListener("click", function () { toggle(v); });
+    v.addEventListener("keydown", function (e) { if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggle(v); } });
+  });
+  var gates = Array.prototype.slice.call(document.querySelectorAll(".gate"));
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) play(en.target); else if (!en.target.paused) en.target.pause();
+      });
+    }, { rootMargin: "160px 0px" });
+    videos.forEach(function (v) { io.observe(v); });
+    var gio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add("lit"); gio.unobserve(en.target); } });
+    }, { rootMargin: "0px 0px -35% 0px" });
+    gates.forEach(function (g) { gio.observe(g); });
+  } else {
+    videos.forEach(play);
+    gates.forEach(function (g) { g.classList.add("lit"); });
+  }
+
+  var tabs = Array.prototype.slice.call(document.querySelectorAll("#cam-tabs button"));
+  var vid = document.getElementById("cam-video");
+  var text = document.getElementById("cam-text");
+  var style = document.getElementById("cam-style");
+  function select(b, focus) {
+    tabs.forEach(function (o) {
+      var on = o === b;
+      o.setAttribute("aria-selected", on ? "true" : "false");
+      o.tabIndex = on ? 0 : -1;
+    });
+    vid.poster = "media/" + b.dataset.cam + ".webp";
+    vid.dataset.src = "media/" + b.dataset.cam + ".mp4";
+    vid.src = vid.dataset.src;
+    held.delete(vid);
+    text.textContent = b.dataset.text;
+    style.textContent = b.dataset.label;
+    play(vid);
+    if (focus) b.focus();
+  }
+  tabs.forEach(function (b, i) {
+    b.tabIndex = i === 0 ? 0 : -1;
+    b.addEventListener("click", function () { select(b, false); });
+    b.addEventListener("keydown", function (e) {
+      var k = e.key, n = null;
+      if (k === "ArrowRight") n = tabs[(i + 1) % tabs.length];
+      else if (k === "ArrowLeft") n = tabs[(i - 1 + tabs.length) % tabs.length];
+      else if (k === "Home") n = tabs[0];
+      else if (k === "End") n = tabs[tabs.length - 1];
+      if (n) { e.preventDefault(); select(n, true); }
+    });
+  });
+})();
+</script>
+</body>
+</html>
