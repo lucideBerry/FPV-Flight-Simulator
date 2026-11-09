@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FPV Flight Simulator Docs</title>
+<meta name="description" content="Documentation for FPV Flight Simulator, the Blender add-on for flying an FPV drone live in the viewport with an RC radio, gamepad or keyboard.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+:root {
+  --paper: #ffffff; --panel: #f4f6f8; --line: #e3e7ec; --ink: #0f1217; --mute: #5b6370;
+  --screen: #0d0f13; --acc: #2f6bff; --osd: #f2f5f7;
+  --ramp: linear-gradient(90deg, #4080ff, #26d9f2 30%, #59f273 55%, #ffcc33 78%, #ff4d33);
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --pixel: "FPV OSD", "Courier New", monospace;
+  --r-lg: 18px; --r-md: 12px;
+  color-scheme: light;
+}
+@font-face { font-family: "FPV OSD"; src: url("media/FPV_OSD.ttf") format("truetype"); font-display: swap; }
+* { box-sizing: border-box; }
+html { background: var(--paper); }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16px/1.65 var(--body); -webkit-font-smoothing: antialiased; }
+.page { max-width: 1080px; margin: 0 auto; padding: 28px 16px 64px; display: grid; gap: 72px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+h1 { font-size: clamp(42px, 8vw, 80px); font-weight: 800; font-stretch: 118%; line-height: .95; }
+h2 { font-size: clamp(28px, 4.2vw, 40px); font-weight: 760; font-stretch: 112%; line-height: 1.05; }
+h3 { font-size: 19px; font-weight: 700; font-stretch: 105%; line-height: 1.25; }
+p { margin: 0; }
+a { color: var(--ink); text-decoration-color: var(--acc); text-underline-offset: 3px; }
+.eyebrow { font-family: var(--pixel); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 10px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--acc); box-shadow: 0 0 0 4px rgba(47,107,255,.15); }
+.lede { font-size: 19px; color: var(--mute); max-width: 62ch; }
+.copy { color: var(--mute); max-width: 68ch; }
+.copy b, .lede b, li b, td b { color: var(--ink); font-weight: 600; }
+section { display: grid; gap: 22px; scroll-margin-top: 16px; }
+.head { display: grid; gap: 12px; }
+.hero { display: grid; gap: 18px; }
+.hero .ramp { width: 220px; height: 6px; border-radius: 3px; background: var(--ramp); }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font-family: var(--pixel); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; color: var(--mute); }
+.toc { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; }
+.toc a { background: var(--paper); padding: 14px 18px; text-decoration: none; display: flex; gap: 12px; align-items: baseline; }
+.toc a span { font-family: var(--pixel); font-size: 12px; color: var(--acc); }
+.toc a:hover { background: var(--panel); }
+@media (max-width: 500px) { .toc { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; counter-reset: s; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 40px 1fr; gap: 14px; align-items: start; }
+.steps li::before { content: counter(s); width: 40px; height: 40px; border-radius: 12px; background: var(--acc); color: #fff; display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-stretch: 115%; font-size: 20px; }
+.steps li div { padding-top: 7px; color: var(--mute); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(200px, 300px); gap: 28px 40px; align-items: start; }
+.two.wide { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+@media (max-width: 600px) { .two, .two.wide { grid-template-columns: 1fr; } }
+figure { margin: 0; display: grid; gap: 8px; }
+figure img { width: 100%; height: auto; display: block; border-radius: var(--r-md); background: var(--screen); border: 1px solid var(--line); }
+figcaption { font-family: var(--pixel); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+.side-img { max-width: 300px; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th { text-align: left; font-family: var(--pixel); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); font-weight: 400; padding: 10px 12px; border-bottom: 1px solid var(--ink); }
+td { padding: 11px 12px; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--mute); }
+td:first-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
+.tbl { border: 1px solid var(--line); border-radius: var(--r-lg); overflow-x: auto; }
+.tbl table td:first-child, .tbl table th:first-child { padding-left: 18px; }
+.tbl tr:last-child td { border-bottom: 0; }
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.cards.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 600px) { .cards, .cards.four { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 440px) { .cards, .cards.four { grid-template-columns: 1fr; } }
+.card { border: 1px solid var(--line); border-radius: var(--r-lg); padding: 18px; display: grid; gap: 8px; align-content: start; background: var(--paper); }
+.card p { color: var(--mute); font-size: 15px; }
+.card .n { font-family: var(--pixel); font-size: 11px; color: var(--acc); letter-spacing: .1em; }
+.note { border-left: 3px solid var(--acc); background: var(--panel); border-radius: 0 var(--r-md) var(--r-md) 0; padding: 14px 18px; color: var(--mute); }
+.note b { color: var(--ink); }
+code, kbd { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: .9em; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; color: var(--ink); }
+ul.plain { margin: 0; padding-left: 20px; color: var(--mute); display: grid; gap: 6px; }
+.foot { border-top: 1px solid var(--line); padding-top: 24px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; color: var(--mute); font-size: 14px; }
+.framed, .framed body { overflow: hidden; scrollbar-width: none; }
+.framed::-webkit-scrollbar, .framed body::-webkit-scrollbar { display: none; }
+</style>
+</head>
+<body>
+<main class="page">
+
+<header class="hero">
+  <span class="eyebrow"><i class="dot"></i>Documentation / v1.0.0</span>
+  <h1>FPV Flight Simulator docs</h1>
+  <div class="ramp"></div>
+  <p class="lede">How to install it, connect your radio or gamepad, set your rates, fly, record takes and render them. The add-on lives in the <b>FPV Flight Simulator</b> tab of the 3D Viewport sidebar.</p>
+  <div class="meta"><span class="pill">Blender 5.0+</span><span class="pill">Windows</span><span class="pill">No dependencies</span><span class="pill">by LarkLab</span></div>
+  <figure><img src="img/hero.jpg" alt="FPV view through a green light-show gate over a city at night" width="1600" height="833"></figure>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <a href="#install"><span>01</span>Install &amp; update</a>
+  <a href="#panel"><span>02</span>The panel</a>
+  <a href="#first"><span>03</span>First flight</a>
+  <a href="#controller"><span>04</span>Your controller</a>
+  <a href="#modes"><span>05</span>Modes &amp; arming</a>
+  <a href="#rates"><span>06</span>Rates</a>
+  <a href="#drones"><span>07</span>Drone presets</a>
+  <a href="#world"><span>08</span>World settings</a>
+  <a href="#record"><span>09</span>Recording &amp; takes</a>
+  <a href="#keys"><span>10</span>Keys &amp; buttons</a>
+  <a href="#trouble"><span>11</span>Troubleshooting</a>
+  <a href="#limits"><span>12</span>Limits &amp; support</a>
+</nav>
+
+<section id="install">
+  <div class="head"><span class="eyebrow"><i class="dot"></i>01</span><h2>Install, update, remove</h2></div>
+  <div class="two">
+    <ol class="steps">
+      <li><div>Download <code>fpv_flight_simulator-1.0.0.zip</code> from your Superhive downloads. Don't unzip it.</div></li>
+      <li><div>In Blender open <b>Edit &rsaquo; Preferences &rsaquo; Get Extensions</b>, open the small arrow menu at the top right and choose <b>Install from Disk&hellip;</b>, then pick the zip. Dragging the zip onto the Blender window works too.</div></li>
+      <li><div>In the 3D Viewport press <kbd>N</kbd> and open the <b>FPV Flight Simulator</b> tab.</div></li>
+    </ol>
+    <figure class="side-img"><img src="img/install.jpg" alt="Install from Disk file browser in Blender" loading="lazy" width="960" height="540"><figcaption>Install from Disk</figcaption></figure>
+  </div>
+  <div class="two wide">
+    <div class="copy"><b>Update:</b> install the new zip the same way. Your takes are stored in the .blend as normal actions, so they stay as they are.</div>
+    <div class="copy"><b>Remove:</b> <b>Remove Drone</b> in the Drone tab deletes the drone, its cameras and the launch pad. Takes stay in the file. To uninstall, use Preferences; your files still render, because every flight is plain keyframes.</div>
+  </div>
+  <p class="copy">Nothing else needs installing. Controllers are read straight through Windows (USB joystick and XInput).</p>
+</section>
+
+<section id="panel">
+  <div class="head"><span class="eyebrow"><i class="dot"></i>02</span><h2>The panel</h2></div>
+  <div class="two">
+    <div style="display:grid;gap:18px">
+      <div class="tbl"><table>
+        <thead><tr><th>Tab</th><th>What's in it</th></tr></thead>
+        <tbody>
+          <tr><td>Fly</td><td>Fly, Record, Retake, Continue and your list of takes.</td></tr>
+          <tr><td>Input</td><td>Controller, setup wizard, live input, keys and buttons, pilot profiles.</td></tr>
+          <tr><td>Drone</td><td>Drone presets, rates with the rate curve, camera and physics.</td></tr>
+          <tr><td>World</td><td>Flight options, collisions, sound, wind, battery and the chase camera.</td></tr>
+        </tbody>
+      </table></div>
+      <ul class="plain">
+        <li>The two lines at the top always show your controller and your drone.</li>
+        <li><b>Getting Started</b> is a short checklist that ticks itself off. Close it with the X.</li>
+        <li><b>Advanced</b> in the panel header shows every setting. Leave it off for a shorter panel.</li>
+      </ul>
+    </div>
+    <figure class="side-img"><img src="img/fly.jpg" alt="The Fly tab with Fly, Record, Retake Here, Continue and a take in the list" loading="lazy" width="372" height="920"><figcaption>The Fly tab</figcaption></figure>
+  </div>
+</section>
+
+<section id="first">
+  <div class="head"><span class="eyebrow"><i class="dot"></i>03</span><h2>Your first flight</h2></div>
+  <ol class="steps">
+    <li><div><b>Press Fly</b> (or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> with the mouse over the viewport). If the scene has no drone yet, one is added at the 3D cursor.</div></li>
+    <li><div><b>Take off.</b> On the keyboard hold <kbd>W</kbd>. With a radio, arm with the throttle low, then throttle up.</div></li>
+    <li><div><b>Fly.</b> Keyboard: arrow keys move, <kbd>A</kbd> <kbd>D</kbd> turn. With no controller the drone starts in Cine mode, so letting go brakes and hovers.</div></li>
+    <li><div><b>Finish</b> with <kbd>Esc</kbd>. The view goes back to where it was.</div></li>
+  </ol>
+  <figure><img src="img/live.jpg" alt="Live flight in the viewport with the HUD: mode, speed, altitude, throttle, battery and stick overlay" loading="lazy" width="1200" height="675"><figcaption>Flying live, with the HUD</figcaption></figure>
+  <div class="note"><b>Smooth viewport:</b> fly in Solid shading for the best frame rate, then render with Eevee or Cycles. The physics always runs in real time.</div>
+</section>
+
+<section id="controller">
+  <div class="head"><span class="eyebrow"><i class="dot"></i>04</span><h2>Connect your controller</h2>
+    <p class="copy">Anything Windows lists as a game controller works: RC radios in USB joystick mode (Radiomaster, TBS, Jumper, BetaFPV, FlySky, iFlight, DJI, any EdgeTX or OpenTX radio), Xbox and PlayStation pads, the Switch Pro controller and other USB gamepads.</p></div>
+  <div class="two">
+    <div style="display:grid;gap:18px">
+      <ol class="steps">
+        <li><div>Plug it in. On a radio, pick <b>USB Joystick (HID)</b> when it asks.</div></li>
+        <li><div>Open the <b>Input</b> tab, press the refresh button and pick your controller.</div></li>
+        <li><div>Press <b>Set Up Controller</b>. Let go of the sticks (throttle down on a radio) and press <b>Next</b>.</div></li>
+        <li><div>Hold each stick when asked: throttle up, throttle down, yaw right, pitch forward, roll right. Each step moves on once you've held it for a moment.</div></li>
+        <li><div>Stir both sticks around their edges and press <b>Finish</b>.</div></li>
+      </ol>
+      <p class="copy">The wizard finds each axis, its direction, center and range, and tells a spring-centered gamepad stick from a radio throttle. Every controller's setup is remembered, so next time you only pick it from the list.</p>
+      <p class="copy"><b>Show Live Input</b> shows what the drone receives. To fix a single axis, click the eyedropper next to it and move that stick, or flip it with the arrow button.</p>
+    </div>
+    <figure class="side-img"><img src="img/input.jpg" alt="Controller setup, step 2 of 7, with live bars for every channel" loading="lazy" width="372" height="770"><figcaption>Setup wizard, step 2</figcaption></figure>
+  </div>
+</section>
+
+<section id="modes">
+  <div class="head"><span class="eyebrow"><i class="dot"></i>05</span><h2>Flight modes and arming</h2></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Mode</th><th>What the sticks do</th></tr></thead>
+    <tbody>
+      <tr><td>Acro</td><td>Rotation speed, like a real freestyle quad. Nothing levels itself.</td></tr>
+      <tr><td>Angle</td><td>Tilt angle, up to 55&deg;. Let go and it levels out.</td></tr>
+      <tr><td>Horizon</td><td>Levels near center, flips at full stick.</td></tr>
+      <tr><td>Cine</td><td>Speed. Let go to brake and hover; the throttle sets the climb rate. Easiest on keys.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="copy">Press <kbd>M</kbd> while flying to switch. <b>Auto</b> starts in Acro with a controller and Cine on the keyboard. With a radio the throttle has to be low to arm, like on a real quad; if it isn't, the HUD says so. Keyboard and gamepad flights arm right away.</p>
+</section>
+
+<section id="rates">
+  <div class="head"><span class="eyebrow"><i class="dot"></i>06</span><h2>Rates</h2></div>
+  <div class="two">
+    <div style="display:grid;gap:18px">
+      <p class="copy">Rates use the Betaflight formulas: <b>Actual</b>, <b>Betaflight</b>, <b>KISS</b> and <b>Quick</b>. The numbers are the ones the Betaflight CLI stores (Actual center 7 = 70&deg;/s, max 67 = 670&deg;/s), and the line under the table shows them as Betaflight Configurator does. The curve updates as you change values: roll is orange, pitch blue, yaw white.</p>
+      <div class="note"><b>Use your own rates:</b> in the Betaflight CLI type <code>diff</code>, copy the output and press <b>Paste Betaflight Rates</b>. Rates type, rates, expo, throttle mid, throttle expo and throttle limit come in. Drone presets then keep your rates.</div>
+      <p class="copy">With <b>Advanced</b> on you also get Throttle Mid, Throttle Expo and Throttle Limit. You can change rates while you fly; they apply straight away.</p>
+    </div>
+    <figure class="side-img"><img src="img/drone.jpg" alt="The Drone tab: 5 inch Freestyle card, rate curve, rate table and Paste Betaflight Rates" loading="lazy" width="372" height="1700"><figcaption>The Drone tab</figcaption></figure>
+  </div>
+</section>
+
+<section id="drones">
+  <div class="head"><span class="eyebrow"><i class="dot"></i>07</span><h2>Drone presets</h2>
+    <p class="copy">Each preset sets the physics, camera uptilt, battery time, rates, throttle curve and a suggested mode. The card shows the build (motors, battery, props), weight, thrust, hover throttle and top speed. Untick <b>Load Preset Rates</b> to keep your own rates.</p></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Group</th><th>Presets</th></tr></thead>
+    <tbody>
+      <tr><td>Freestyle</td><td>5" Freestyle, 5" Juicy Freestyle, 5" Bando Basher</td></tr>
+      <tr><td>Race</td><td>5" Race</td></tr>
+      <tr><td>Micro</td><td>3" Toothpick, 65 mm Tiny Whoop</td></tr>
+      <tr><td>Cinematic</td><td>3.5" Cinewhoop, 2.5" Indoor Cinewhoop, X8 Cinelifter</td></tr>
+      <tr><td>Long range</td><td>4" Light Long Range, 6" Mountain Surfer, 7" Long Range</td></tr>
+      <tr><td>Learn</td><td>Beginner Trainer: Angle mode, soft rates, 70% throttle limit</td></tr>
+    </tbody>
+  </table></div>
+  <div class="cards">
+    <div class="card"><span class="n">BASICS</span><h3>Weight, thrust, response</h3><p>How heavy and punchy the quad is, and how fast it reaches the rotation you ask for.</p></div>
+    <div class="card"><span class="n">CAMERA</span><h3>Uptilt and field of view</h3><p>Set the FPV camera like on your quad, or fly any camera in your scene with <b>Camera</b>.</p></div>
+    <div class="card"><span class="n">ADVANCED</span><h3>Physics details</h3><p>Front, side and top drag, rotor drag, prop pitch speed, angular acceleration, motor spool, collision radius and prop wash.</p></div>
+  </div>
+</section>
+
+<section id="world">
+  <div class="head"><span class="eyebrow"><i class="dot"></i>08</span><h2>World settings</h2></div>
+  <div class="two">
+    <div class="tbl"><table>
+      <thead><tr><th>Setting</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td>Collide</td><td>Every visible mesh, one collection, or nothing. Instances and Geometry Nodes geometry count too.</td></tr>
+        <tr><td>Floor</td><td>An invisible ground plane at the height you set.</td></tr>
+        <tr><td>On Crash</td><td>Bounce and keep flying, reset to the launch pad, or pause.</td></tr>
+        <tr><td>Meters per Unit</td><td>For scenes that aren't in meters, for example 0.01 for centimeters.</td></tr>
+        <tr><td>Wind &amp; Battery</td><td>Wind, turbulence and battery time. Thrust sags as the pack drains.</td></tr>
+        <tr><td>Flight Options</td><td>Default mode, slow-motion speed, record countdown, rewind speed, trail and HUD.</td></tr>
+        <tr><td>Sound</td><td>The prop sound while you fly, and its volume. Nothing is added to your scene.</td></tr>
+        <tr><td>Chase Camera</td><td>Distance, height and lag of the chase camera.</td></tr>
+      </tbody>
+    </table></div>
+    <figure class="side-img"><img src="img/world.jpg" alt="The World tab: Flight Options, Collisions, Sound, Wind and Battery" loading="lazy" width="372" height="1160"><figcaption>The World tab</figcaption></figure>
+  </div>
+  <p class="copy"><b>Launch Pad to Cursor</b> moves the take-off spot to the 3D cursor.</p>
+</section>
+
+<section id="record">
+  <div class="head"><span class="eyebrow"><i class="dot"></i>09</span><h2>Recording and takes</h2></div>
+  <ol class="steps">
+    <li><div>Press <b>Record</b>. Recording starts the moment you take off. Mid-flight, <kbd>R</kbd> starts it after a short 3-2-1 countdown.</div></li>
+    <li><div>Fly. <kbd>R</kbd> stops and saves the take, and you keep flying. Press it again for the next take.</div></li>
+    <li><div><kbd>Esc</kbd> finishes. The last take goes on the drone and the frame range is set to it.</div></li>
+  </ol>
+  <div class="cards">
+    <div class="card"><span class="n">HOLD Q</span><h3>Rewind</h3><p>Time runs backwards while you hold it, recording included. Let go and fly on from there.</p></div>
+    <div class="card"><span class="n">T</span><h3>Slow motion</h3><p>Fly at the Slow speed (0.5 = half). The take still plays back at real speed.</p></div>
+    <div class="card"><span class="n">RETAKE</span><h3>Retake Here</h3><p>Put the playhead where it went wrong. The old take plays for the pre-roll, the HUD shows its throttle next to yours, then you take over. Everything before stays.</p></div>
+    <div class="card"><span class="n">CONTINUE</span><h3>Continue</h3><p>The same, from the end of the take.</p></div>
+    <div class="card"><span class="n">POLISH</span><h3>Smooth Take</h3><p>A smoothed copy of the take. Location and rotation have separate amounts.</p></div>
+    <div class="card"><span class="n">POLISH</span><h3>Stabilized Camera</h3><p>A smooth camera with a level horizon, for cinematic cuts.</p></div>
+  </div>
+  <div class="two wide">
+    <figure><img src="img/fpv.jpg" alt="FPV camera render of the take" loading="lazy" width="1200" height="600"><figcaption>FPV camera</figcaption></figure>
+    <figure><img src="img/chase.jpg" alt="Chase camera render following the drone through an orange gate" loading="lazy" width="1200" height="675"><figcaption>Chase camera</figcaption></figure>
+  </div>
+  <p class="copy">Every take is a normal action (FP Take 01, 02&hellip;), so it plays on the timeline and renders anywhere, even without the add-on. Switch the render camera with <b>Render: FPV, Chase, Stable</b>. While you record the timeline runs, so animated objects are where you see them. The drone also keeps speed, altitude, throttle, motor and battery as keyed properties, ready for an OSD.</p>
+</section>
+
+<section id="keys">
+  <div class="head"><span class="eyebrow"><i class="dot"></i>10</span><h2>Keys and buttons</h2></div>
+  <div class="two wide">
+    <div class="tbl"><table>
+      <thead><tr><th>Key</th><th>While flying</th></tr></thead>
+      <tbody>
+        <tr><td>W / S</td><td>Throttle up / down</td></tr>
+        <tr><td>A / D</td><td>Yaw left / right</td></tr>
+        <tr><td>Arrows</td><td>Pitch and roll</td></tr>
+        <tr><td>R</td><td>Record / stop</td></tr>
+        <tr><td>Q (hold)</td><td>Rewind</td></tr>
+        <tr><td>T</td><td>Slow motion</td></tr>
+        <tr><td>M</td><td>Next flight mode</td></tr>
+        <tr><td>C</td><td>View: FPV, chase, free</td></tr>
+        <tr><td>V</td><td>Arm / disarm</td></tr>
+        <tr><td>P</td><td>Pause</td></tr>
+        <tr><td>Backspace</td><td>Back to the launch pad</td></tr>
+        <tr><td>Esc / Enter</td><td>Finish</td></tr>
+      </tbody>
+    </table></div>
+    <div style="display:grid;gap:18px;align-content:start">
+      <p class="copy">To change one, open <b>Keys &amp; Buttons</b> in the Input tab, click the slot and press a key, a controller button or flip a radio switch. A switch works like on a real radio: up starts recording or arms, down stops or disarms.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>Xbox pad</th><th>Out of the box</th></tr></thead>
+        <tbody>
+          <tr><td>A</td><td>Record</td></tr><tr><td>RB</td><td>Arm</td></tr><tr><td>Y</td><td>Mode</td></tr>
+          <tr><td>X</td><td>View</td></tr><tr><td>LB</td><td>Slow motion</td></tr><tr><td>D-pad left</td><td>Rewind</td></tr>
+          <tr><td>Back / Start</td><td>Reset / Pause</td></tr>
+        </tbody>
+      </table></div>
+      <p class="copy"><b>Keyboard Feel</b> sets how fast keys ramp and how far they push the stick. <b>Pilot Profile</b> saves your controller, rates and keys to load in any file.</p>
+    </div>
+  </div>
+</section>
+
+<section id="trouble">
+  <div class="head"><span class="eyebrow"><i class="dot"></i>11</span><h2>Troubleshooting</h2></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Problem</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Controller not in the list</td><td>Press the refresh button. On a radio, choose USB joystick mode, not storage or serial.</td></tr>
+      <tr><td>A stick goes the wrong way</td><td>Click the arrow button next to that axis, or run Set Up Controller again.</td></tr>
+      <tr><td>Drifts with sticks centered</td><td>Raise Deadband (Advanced, Axes section).</td></tr>
+      <tr><td>"Lower the throttle to arm"</td><td>Pull the throttle fully down. Radios only arm at low throttle.</td></tr>
+      <tr><td>Flies through a wall</td><td>Check Collide isn't set to Nothing and the wall is a visible mesh when you press Fly.</td></tr>
+      <tr><td>Feels too fast or too slow</td><td>Your scene isn't in meters. Set Meters per Unit in the World tab.</td></tr>
+      <tr><td>Low frame rate</td><td>Fly in Solid shading. The flight is the same; render afterwards.</td></tr>
+      <tr><td>Controller unplugged mid-flight</td><td>The sticks center and the drone keeps going; plug it back in and it reconnects.</td></tr>
+      <tr><td>No sound</td><td>Check Motor Sound in World &rsaquo; Sound and Blender's audio device in Preferences.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="limits">
+  <div class="head"><span class="eyebrow"><i class="dot"></i>12</span><h2>Known limits and support</h2></div>
+  <div class="two wide">
+    <ul class="plain">
+      <li>Windows only.</li>
+      <li>The drone collides as a sphere about the size of its props.</li>
+      <li>Obstacles are taken as they are when you press Fly; moving objects don't push the drone.</li>
+      <li>One drone per scene.</li>
+    </ul>
+    <div style="display:grid;gap:14px;align-content:start">
+      <p class="copy">Questions, bugs or a feature request? Contact <b>LarkLab</b> through Superhive. Tell us your Blender version and your controller, and send the .blend if you can.</p>
+      <p><a href="https://superhivemarket.com/creators/larklab" target="_blank" rel="noopener">superhivemarket.com/creators/larklab</a></p>
+    </div>
+  </div>
+</section>
+
+<footer class="foot"><span>FPV Flight Simulator 1.0.0 / Blender 5.0+ / Windows</span><span>by LarkLab</span></footer>
+</main>
+<script>
+(function () {
+  var framed = true;
+  try { framed = window.self !== window.top; } catch (e) {}
+  if (!framed) return;
+  var root = document.documentElement;
+  root.classList.add("framed");
+  function fit() { var w = window.innerWidth; root.style.zoom = w < 832 && w > 400 ? String(w / 832) : ""; }
+  fit();
+  window.addEventListener("resize", fit);
+})();
+</script>
+</body>
+</html>
